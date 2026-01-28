@@ -1,0 +1,11 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  font-family: "Inter", "Segoe UI", system-ui, sans-serif;
+}
+
+input[type="range"] {
+  accent-color: #38bdf8;
+}
