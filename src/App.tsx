@@ -1,6 +1,9 @@
 import { useMemo, useState } from "react";
 import Controls, { OutputSize } from "./components/Controls";
 import Preview from "./components/Preview";
+import { Badge } from "./components/ui/badge";
+import { Button } from "./components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "./components/ui/card";
 import { palettes, randomPalette } from "./lib/palettes";
 import { RenderConfig, renderBackground } from "./lib/render";
 import { pickOne, randomBetween, seededRandom } from "./lib/prng";
@@ -173,7 +176,7 @@ export default function App() {
   const [size, setSize] = useState<OutputSize>(outputSizes[0]);
 
   const previewSize = useMemo(() => {
-    const maxWidth = 920;
+    const maxWidth = 960;
     const ratio = size.height / size.width;
     return { width: maxWidth, height: Math.round(maxWidth * ratio) };
   }, [size]);
@@ -232,9 +235,73 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 px-4 py-8 text-slate-100">
-      <div className="mx-auto flex w-full max-w-6xl flex-col gap-6 lg:flex-row">
-        <div className="w-full max-w-xl">
+    <div className="min-h-screen bg-slate-950 text-slate-100">
+      <header className="border-b border-slate-900/80 bg-slate-950/60 px-6 py-4 backdrop-blur">
+        <div className="mx-auto flex w-full max-w-7xl items-center justify-between gap-4">
+          <div>
+            <p className="text-xs uppercase tracking-[0.2em] text-slate-500">Aurora UI</p>
+            <h1 className="text-2xl font-semibold text-white">Gradient Background Builder</h1>
+          </div>
+          <div className="flex items-center gap-2">
+            <Badge>Canvas {size.width} × {size.height}</Badge>
+            <Button variant="outline" size="sm" onClick={handleRandomize}>
+              Surprise me
+            </Button>
+          </div>
+        </div>
+      </header>
+
+      <main className="mx-auto grid w-full max-w-7xl gap-6 px-6 py-8 lg:grid-cols-[240px_minmax(0,1fr)_360px]">
+        <aside className="flex flex-col gap-4">
+          <Card>
+            <CardHeader>
+              <CardTitle>Scenes</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-2">
+              {presets.map((preset) => (
+                <button
+                  key={preset.name}
+                  type="button"
+                  className="flex w-full items-center justify-between rounded-xl border border-slate-800/80 bg-slate-950/60 px-3 py-2 text-left text-sm text-slate-200 transition hover:border-slate-600 hover:text-white"
+                  onClick={() => handlePreset(preset.name)}
+                >
+                  <span>{preset.name}</span>
+                  <span className="text-xs text-slate-500">Preset</span>
+                </button>
+              ))}
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader>
+              <CardTitle>Tips</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-2 text-xs text-slate-400">
+              <p>Lock the seed to reproduce a background exactly.</p>
+              <p>Use mesh gradients for cinematic lighting.</p>
+              <p>Export at 4K for full-resolution wallpapers.</p>
+            </CardContent>
+          </Card>
+        </aside>
+
+        <section className="flex flex-col gap-4">
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between">
+              <CardTitle>Preview</CardTitle>
+              <span className="text-xs text-slate-400">{size.width} × {size.height}px</span>
+            </CardHeader>
+            <CardContent>
+              <Preview config={config} width={previewSize.width} height={previewSize.height} />
+            </CardContent>
+          </Card>
+          <Card>
+            <CardContent className="text-xs text-slate-400">
+              Export as PNG to save the current configuration. Copy/paste the JSON to share exact
+              settings with teammates.
+            </CardContent>
+          </Card>
+        </section>
+
+        <aside className="max-h-[calc(100vh-140px)] overflow-y-auto pr-1">
           <Controls
             config={config}
             onChange={setConfig}
@@ -250,26 +317,10 @@ export default function App() {
             presets={presets.map((preset) => ({ name: preset.name }))}
             onPreset={handlePreset}
           />
-        </div>
-        <div className="flex w-full flex-1 flex-col gap-4">
-          <div className="rounded-2xl border border-slate-800 bg-slate-900/60 p-4 text-sm text-slate-300">
-            <div className="flex items-center justify-between">
-              <span>Preview</span>
-              <span>
-                {size.width} x {size.height}px
-              </span>
-            </div>
-          </div>
-          <Preview config={config} width={previewSize.width} height={previewSize.height} />
-          <div className="rounded-2xl border border-slate-800 bg-slate-900/60 p-4 text-xs text-slate-400">
-            <p>
-              Tip: lock the seed to reproduce a background. Copy the JSON config to share exact
-              settings.
-            </p>
-          </div>
-        </div>
-      </div>
-      <footer className="mx-auto mt-10 max-w-6xl text-xs text-slate-500">
+        </aside>
+      </main>
+
+      <footer className="mx-auto max-w-7xl px-6 pb-10 text-xs text-slate-500">
         <p>Run: npm install · npm run dev</p>
       </footer>
     </div>

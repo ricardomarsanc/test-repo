@@ -1,4 +1,11 @@
 import { RenderConfig } from "../lib/render";
+import { Badge } from "./ui/badge";
+import { Button } from "./ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
+import { Input } from "./ui/input";
+import { Label } from "./ui/label";
+import { Separator } from "./ui/separator";
+import { Switch } from "./ui/switch";
 
 export interface OutputSize {
   label: string;
@@ -22,7 +29,8 @@ interface ControlsProps {
   onPreset: (name: string) => void;
 }
 
-const sectionClass = "rounded-2xl border border-slate-800 bg-slate-900/70 p-4 shadow-panel";
+const sliderClassName =
+  "mt-2 w-full cursor-pointer accent-sky-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-500";
 
 export default function Controls({
   config,
@@ -43,130 +51,139 @@ export default function Controls({
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex flex-col gap-2">
-        <h1 className="text-3xl font-semibold text-white">Background Generator</h1>
-        <p className="text-sm text-slate-400">
-          Generate deterministic modern backgrounds with gradients, patterns, and layered textures.
-        </p>
-      </div>
+      <Card>
+        <CardHeader>
+          <div className="flex items-start justify-between gap-3">
+            <div>
+              <CardTitle className="text-base">Background Studio</CardTitle>
+              <p className="mt-1 text-xs text-slate-400">
+                Craft cinematic gradients with deterministic seeds and layered texture controls.
+              </p>
+            </div>
+            <Badge>Beta</Badge>
+          </div>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          <div className="grid gap-2 sm:grid-cols-2">
+            <Button variant="accent" className="justify-center" onClick={onRandomize}>
+              Randomize
+            </Button>
+            <Button variant="secondary" className="justify-center" onClick={onDownload}>
+              Download PNG
+            </Button>
+          </div>
+          <div className="grid gap-2 sm:grid-cols-2">
+            <Button variant="outline" onClick={onCopy}>
+              Copy JSON
+            </Button>
+            <Button variant="outline" onClick={onPaste}>
+              Paste JSON
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
 
-      <div className="flex flex-wrap gap-3">
-        <button
-          className="rounded-full bg-sky-500 px-4 py-2 text-sm font-semibold text-white shadow-lg transition hover:bg-sky-400"
-          onClick={onRandomize}
-          type="button"
-        >
-          Randomize
-        </button>
-        <button
-          className="rounded-full bg-emerald-500 px-4 py-2 text-sm font-semibold text-white shadow-lg transition hover:bg-emerald-400"
-          onClick={onDownload}
-          type="button"
-        >
-          Download PNG
-        </button>
-        <button
-          className="rounded-full border border-slate-700 px-4 py-2 text-sm text-slate-200 transition hover:border-slate-500"
-          onClick={onCopy}
-          type="button"
-        >
-          Copy config JSON
-        </button>
-        <button
-          className="rounded-full border border-slate-700 px-4 py-2 text-sm text-slate-200 transition hover:border-slate-500"
-          onClick={onPaste}
-          type="button"
-        >
-          Paste config JSON
-        </button>
-      </div>
-
-      <div className={sectionClass}>
-        <h2 className="mb-3 text-lg font-semibold text-white">Seed</h2>
-        <div className="flex flex-col gap-3">
+      <Card>
+        <CardHeader>
+          <CardTitle>Seed</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-3">
           <div className="flex items-center gap-3">
-            <input
-              className="w-full rounded-xl border border-slate-700 bg-slate-900 px-3 py-2 text-sm text-white"
+            <Input
               value={config.seed}
               onChange={(event) => update({ seed: event.target.value })}
             />
-            <label className="flex items-center gap-2 text-sm text-slate-300">
-              <input
-                type="checkbox"
+            <div className="flex items-center gap-2">
+              <Switch
                 checked={config.lockSeed}
                 onChange={(event) => update({ lockSeed: event.target.checked })}
               />
-              Lock
-            </label>
+              <Label>Lock</Label>
+            </div>
           </div>
           <p className="text-xs text-slate-400">Current seed: {config.seed}</p>
-        </div>
-      </div>
+        </CardContent>
+      </Card>
 
-      <div className={sectionClass}>
-        <h2 className="mb-3 text-lg font-semibold text-white">Presets</h2>
-        <div className="flex flex-wrap gap-2">
+      <Card>
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <CardTitle>Presets</CardTitle>
+            <Badge>Curated</Badge>
+          </div>
+        </CardHeader>
+        <CardContent className="flex flex-wrap gap-2">
           {presets.map((preset) => (
-            <button
+            <Button
               key={preset.name}
-              type="button"
-              className="rounded-full border border-slate-700 px-3 py-1 text-xs text-slate-300 transition hover:border-slate-500"
+              variant="ghost"
+              size="sm"
+              className="rounded-full border border-slate-800"
               onClick={() => onPreset(preset.name)}
             >
               {preset.name}
-            </button>
+            </Button>
           ))}
-        </div>
-      </div>
+        </CardContent>
+      </Card>
 
-      <div className={sectionClass}>
-        <h2 className="mb-3 text-lg font-semibold text-white">Export size</h2>
-        <div className="flex flex-wrap gap-2">
-          {outputSizes.map((size) => (
-            <button
-              key={size.label}
-              type="button"
-              className={`rounded-full px-3 py-1 text-xs font-semibold transition ${
-                selectedSize.label === size.label
-                  ? "bg-slate-100 text-slate-900"
-                  : "border border-slate-700 text-slate-300 hover:border-slate-500"
-              }`}
-              onClick={() => onSizeChange(size)}
-            >
-              {size.label}
-            </button>
-          ))}
-        </div>
-        {selectedSize.label === "Custom" && (
-          <div className="mt-3 flex gap-2">
-            <input
-              type="number"
-              min={320}
-              className="w-full rounded-lg border border-slate-700 bg-slate-900 px-3 py-2 text-sm text-white"
-              value={selectedSize.width}
-              onChange={(event) => onCustomSizeChange(Number(event.target.value), selectedSize.height)}
-            />
-            <input
-              type="number"
-              min={320}
-              className="w-full rounded-lg border border-slate-700 bg-slate-900 px-3 py-2 text-sm text-white"
-              value={selectedSize.height}
-              onChange={(event) => onCustomSizeChange(selectedSize.width, Number(event.target.value))}
-            />
+      <Card>
+        <CardHeader>
+          <CardTitle>Export size</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          <div className="flex flex-wrap gap-2">
+            {outputSizes.map((size) => (
+              <Button
+                key={size.label}
+                variant={selectedSize.label === size.label ? "default" : "outline"}
+                size="sm"
+                onClick={() => onSizeChange(size)}
+              >
+                {size.label}
+              </Button>
+            ))}
           </div>
-        )}
-      </div>
+          {selectedSize.label === "Custom" && (
+            <div className="grid gap-2 sm:grid-cols-2">
+              <Input
+                type="number"
+                min={320}
+                value={selectedSize.width}
+                onChange={(event) =>
+                  onCustomSizeChange(Number(event.target.value), selectedSize.height)
+                }
+              />
+              <Input
+                type="number"
+                min={320}
+                value={selectedSize.height}
+                onChange={(event) =>
+                  onCustomSizeChange(selectedSize.width, Number(event.target.value))
+                }
+              />
+            </div>
+          )}
+        </CardContent>
+      </Card>
 
-      <div className={sectionClass}>
-        <h2 className="mb-3 text-lg font-semibold text-white">Gradient</h2>
-        <div className="grid gap-3">
-          <label className="text-sm text-slate-300">
-            Type
+      <Card>
+        <CardHeader>
+          <CardTitle>Gradient</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="grid gap-3">
+            <Label>Type</Label>
             <select
-              className="mt-1 w-full rounded-lg border border-slate-700 bg-slate-900 px-3 py-2 text-sm text-white"
+              className="h-10 w-full rounded-xl border border-slate-800 bg-slate-950/70 px-3 text-sm text-slate-100 focus:border-sky-500 focus:outline-none focus:ring-1 focus:ring-sky-500"
               value={config.gradient.type}
               onChange={(event) =>
-                update({ gradient: { ...config.gradient, type: event.target.value as RenderConfig["gradient"]["type"] } })
+                update({
+                  gradient: {
+                    ...config.gradient,
+                    type: event.target.value as RenderConfig["gradient"]["type"],
+                  },
+                })
               }
             >
               <option value="linear">Linear</option>
@@ -174,9 +191,12 @@ export default function Controls({
               <option value="conic">Conic</option>
               <option value="mesh">Mesh-like</option>
             </select>
-          </label>
-          <label className="text-sm text-slate-300">
-            Angle: {Math.round(config.gradient.angle)}°
+          </div>
+          <div>
+            <div className="flex items-center justify-between text-xs text-slate-300">
+              <span>Angle</span>
+              <span>{Math.round(config.gradient.angle)}°</span>
+            </div>
             <input
               type="range"
               min={0}
@@ -185,11 +205,14 @@ export default function Controls({
               onChange={(event) =>
                 update({ gradient: { ...config.gradient, angle: Number(event.target.value) } })
               }
-              className="mt-1 w-full"
+              className={sliderClassName}
             />
-          </label>
-          <label className="text-sm text-slate-300">
-            Softness
+          </div>
+          <div>
+            <div className="flex items-center justify-between text-xs text-slate-300">
+              <span>Softness</span>
+              <span>{config.gradient.softness.toFixed(2)}</span>
+            </div>
             <input
               type="range"
               min={0}
@@ -199,9 +222,9 @@ export default function Controls({
               onChange={(event) =>
                 update({ gradient: { ...config.gradient, softness: Number(event.target.value) } })
               }
-              className="mt-1 w-full"
+              className={sliderClassName}
             />
-          </label>
+          </div>
           <div className="flex flex-wrap gap-2">
             {config.gradient.palette.map((color, index) => (
               <input
@@ -213,12 +236,12 @@ export default function Controls({
                   nextPalette[index] = event.target.value;
                   update({ gradient: { ...config.gradient, palette: nextPalette } });
                 }}
-                className="h-10 w-10 cursor-pointer rounded-lg border border-slate-700"
+                className="h-10 w-10 cursor-pointer rounded-lg border border-slate-800"
               />
             ))}
-            <button
-              type="button"
-              className="rounded-lg border border-slate-700 px-3 py-2 text-xs text-slate-300"
+            <Button
+              size="sm"
+              variant="outline"
               onClick={() =>
                 update({
                   gradient: {
@@ -235,48 +258,54 @@ export default function Controls({
               }
             >
               + Color
-            </button>
-            <button
-              type="button"
-              className="rounded-lg border border-slate-700 px-3 py-2 text-xs text-slate-300"
-              onClick={onRandomPalette}
-            >
+            </Button>
+            <Button size="sm" variant="outline" onClick={onRandomPalette}>
               Random palette
-            </button>
+            </Button>
           </div>
-          <div className="flex gap-2">
-            <button
-              type="button"
-              className="rounded-full border border-slate-700 px-3 py-1 text-xs text-slate-300"
+          <div className="flex items-center gap-2">
+            <Button
+              size="sm"
+              variant="ghost"
               onClick={() =>
-                update({ gradient: { ...config.gradient, palette: config.gradient.palette.slice(0, -1) } })
+                update({
+                  gradient: {
+                    ...config.gradient,
+                    palette: config.gradient.palette.slice(0, -1),
+                  },
+                })
               }
               disabled={config.gradient.palette.length <= 2}
             >
               Remove
-            </button>
+            </Button>
+            <Separator className="flex-1" />
           </div>
-          <div className="flex h-3 overflow-hidden rounded-full border border-slate-700">
+          <div className="flex h-3 overflow-hidden rounded-full border border-slate-800">
             {config.gradient.palette.map((color, index) => (
               <div key={`${color}-${index}`} className="h-full flex-1" style={{ background: color }} />
             ))}
           </div>
-        </div>
-      </div>
+        </CardContent>
+      </Card>
 
-      <div className={sectionClass}>
-        <h2 className="mb-3 text-lg font-semibold text-white">Noise</h2>
-        <div className="grid gap-3">
-          <label className="flex items-center gap-2 text-sm text-slate-300">
-            <input
-              type="checkbox"
+      <Card>
+        <CardHeader>
+          <CardTitle>Noise</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="flex items-center justify-between">
+            <Label>Enabled</Label>
+            <Switch
               checked={config.noise.enabled}
               onChange={(event) => update({ noise: { ...config.noise, enabled: event.target.checked } })}
             />
-            Enabled
-          </label>
-          <label className="text-sm text-slate-300">
-            Strength: {config.noise.strength.toFixed(2)}
+          </div>
+          <div>
+            <div className="flex items-center justify-between text-xs text-slate-300">
+              <span>Strength</span>
+              <span>{config.noise.strength.toFixed(2)}</span>
+            </div>
             <input
               type="range"
               min={0}
@@ -286,11 +315,14 @@ export default function Controls({
               onChange={(event) =>
                 update({ noise: { ...config.noise, strength: Number(event.target.value) } })
               }
-              className="mt-1 w-full"
+              className={sliderClassName}
             />
-          </label>
-          <label className="text-sm text-slate-300">
-            Scale
+          </div>
+          <div>
+            <div className="flex items-center justify-between text-xs text-slate-300">
+              <span>Scale</span>
+              <span>{config.noise.scale.toFixed(1)}</span>
+            </div>
             <input
               type="range"
               min={0.5}
@@ -298,40 +330,45 @@ export default function Controls({
               step={0.1}
               value={config.noise.scale}
               onChange={(event) => update({ noise: { ...config.noise, scale: Number(event.target.value) } })}
-              className="mt-1 w-full"
+              className={sliderClassName}
             />
-          </label>
-          <label className="flex items-center gap-2 text-sm text-slate-300">
-            <input
-              type="checkbox"
+          </div>
+          <div className="flex items-center justify-between">
+            <Label>Monochrome</Label>
+            <Switch
               checked={config.noise.monochrome}
               onChange={(event) =>
                 update({ noise: { ...config.noise, monochrome: event.target.checked } })
               }
             />
-            Monochrome
-          </label>
-        </div>
-      </div>
+          </div>
+        </CardContent>
+      </Card>
 
-      <div className={sectionClass}>
-        <h2 className="mb-3 text-lg font-semibold text-white">Pattern</h2>
-        <div className="grid gap-3">
-          <label className="flex items-center gap-2 text-sm text-slate-300">
-            <input
-              type="checkbox"
+      <Card>
+        <CardHeader>
+          <CardTitle>Pattern</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="flex items-center justify-between">
+            <Label>Enabled</Label>
+            <Switch
               checked={config.pattern.enabled}
               onChange={(event) => update({ pattern: { ...config.pattern, enabled: event.target.checked } })}
             />
-            Enabled
-          </label>
-          <label className="text-sm text-slate-300">
-            Type
+          </div>
+          <div className="grid gap-3">
+            <Label>Type</Label>
             <select
-              className="mt-1 w-full rounded-lg border border-slate-700 bg-slate-900 px-3 py-2 text-sm text-white"
+              className="h-10 w-full rounded-xl border border-slate-800 bg-slate-950/70 px-3 text-sm text-slate-100 focus:border-sky-500 focus:outline-none focus:ring-1 focus:ring-sky-500"
               value={config.pattern.type}
               onChange={(event) =>
-                update({ pattern: { ...config.pattern, type: event.target.value as RenderConfig["pattern"]["type"] } })
+                update({
+                  pattern: {
+                    ...config.pattern,
+                    type: event.target.value as RenderConfig["pattern"]["type"],
+                  },
+                })
               }
             >
               <option value="dots">Dots</option>
@@ -341,9 +378,12 @@ export default function Controls({
               <option value="topo">Topographic</option>
               <option value="halftone">Halftone</option>
             </select>
-          </label>
-          <label className="text-sm text-slate-300">
-            Opacity: {config.pattern.opacity.toFixed(2)}
+          </div>
+          <div>
+            <div className="flex items-center justify-between text-xs text-slate-300">
+              <span>Opacity</span>
+              <span>{config.pattern.opacity.toFixed(2)}</span>
+            </div>
             <input
               type="range"
               min={0}
@@ -353,11 +393,14 @@ export default function Controls({
               onChange={(event) =>
                 update({ pattern: { ...config.pattern, opacity: Number(event.target.value) } })
               }
-              className="mt-1 w-full"
+              className={sliderClassName}
             />
-          </label>
-          <label className="text-sm text-slate-300">
-            Scale
+          </div>
+          <div>
+            <div className="flex items-center justify-between text-xs text-slate-300">
+              <span>Scale</span>
+              <span>{config.pattern.scale.toFixed(1)}</span>
+            </div>
             <input
               type="range"
               min={0.5}
@@ -365,11 +408,14 @@ export default function Controls({
               step={0.1}
               value={config.pattern.scale}
               onChange={(event) => update({ pattern: { ...config.pattern, scale: Number(event.target.value) } })}
-              className="mt-1 w-full"
+              className={sliderClassName}
             />
-          </label>
-          <label className="text-sm text-slate-300">
-            Rotation: {Math.round(config.pattern.rotation)}°
+          </div>
+          <div>
+            <div className="flex items-center justify-between text-xs text-slate-300">
+              <span>Rotation</span>
+              <span>{Math.round(config.pattern.rotation)}°</span>
+            </div>
             <input
               type="range"
               min={0}
@@ -378,35 +424,36 @@ export default function Controls({
               onChange={(event) =>
                 update({ pattern: { ...config.pattern, rotation: Number(event.target.value) } })
               }
-              className="mt-1 w-full"
+              className={sliderClassName}
             />
-          </label>
-        </div>
-      </div>
+          </div>
+        </CardContent>
+      </Card>
 
-      <div className={sectionClass}>
-        <h2 className="mb-3 text-lg font-semibold text-white">Decorative elements</h2>
-        <div className="grid gap-3">
-          <label className="flex items-center gap-2 text-sm text-slate-300">
-            <input
-              type="checkbox"
+      <Card>
+        <CardHeader>
+          <CardTitle>Decorative elements</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="flex items-center justify-between">
+            <Label>Enabled</Label>
+            <Switch
               checked={config.decorative.enabled}
               onChange={(event) =>
                 update({ decorative: { ...config.decorative, enabled: event.target.checked } })
               }
             />
-            Enabled
-          </label>
-          <div className="grid grid-cols-2 gap-2 text-sm text-slate-300">
+          </div>
+          <div className="grid grid-cols-2 gap-3">
             {([
               ["blobs", "Blobs"],
               ["bokeh", "Bokeh"],
               ["clouds", "Clouds"],
               ["streaks", "Light streaks"],
             ] as const).map(([key, label]) => (
-              <label key={key} className="flex items-center gap-2">
-                <input
-                  type="checkbox"
+              <div key={key} className="flex items-center justify-between gap-2">
+                <Label>{label}</Label>
+                <Switch
                   checked={config.decorative[key]}
                   onChange={(event) =>
                     update({
@@ -414,12 +461,14 @@ export default function Controls({
                     })
                   }
                 />
-                {label}
-              </label>
+              </div>
             ))}
           </div>
-          <label className="text-sm text-slate-300">
-            Density
+          <div>
+            <div className="flex items-center justify-between text-xs text-slate-300">
+              <span>Density</span>
+              <span>{config.decorative.density.toFixed(2)}</span>
+            </div>
             <input
               type="range"
               min={0}
@@ -429,11 +478,14 @@ export default function Controls({
               onChange={(event) =>
                 update({ decorative: { ...config.decorative, density: Number(event.target.value) } })
               }
-              className="mt-1 w-full"
+              className={sliderClassName}
             />
-          </label>
-          <label className="text-sm text-slate-300">
-            Blur
+          </div>
+          <div>
+            <div className="flex items-center justify-between text-xs text-slate-300">
+              <span>Blur</span>
+              <span>{config.decorative.blur.toFixed(2)}</span>
+            </div>
             <input
               type="range"
               min={0}
@@ -443,13 +495,13 @@ export default function Controls({
               onChange={(event) =>
                 update({ decorative: { ...config.decorative, blur: Number(event.target.value) } })
               }
-              className="mt-1 w-full"
+              className={sliderClassName}
             />
-          </label>
-          <label className="text-sm text-slate-300">
-            Color strategy
+          </div>
+          <div className="grid gap-3">
+            <Label>Color strategy</Label>
             <select
-              className="mt-1 w-full rounded-lg border border-slate-700 bg-slate-900 px-3 py-2 text-sm text-white"
+              className="h-10 w-full rounded-xl border border-slate-800 bg-slate-950/70 px-3 text-sm text-slate-100 focus:border-sky-500 focus:outline-none focus:ring-1 focus:ring-sky-500"
               value={config.decorative.colorStrategy}
               onChange={(event) =>
                 update({
@@ -463,9 +515,12 @@ export default function Controls({
               <option value="palette">From palette</option>
               <option value="neutral">Neutral white</option>
             </select>
-          </label>
-          <label className="text-sm text-slate-300">
-            Opacity min
+          </div>
+          <div>
+            <div className="flex items-center justify-between text-xs text-slate-300">
+              <span>Opacity min</span>
+              <span>{config.decorative.opacityMin.toFixed(2)}</span>
+            </div>
             <input
               type="range"
               min={0.05}
@@ -473,15 +528,16 @@ export default function Controls({
               step={0.05}
               value={config.decorative.opacityMin}
               onChange={(event) =>
-                update({
-                  decorative: { ...config.decorative, opacityMin: Number(event.target.value) },
-                })
+                update({ decorative: { ...config.decorative, opacityMin: Number(event.target.value) } })
               }
-              className="mt-1 w-full"
+              className={sliderClassName}
             />
-          </label>
-          <label className="text-sm text-slate-300">
-            Opacity max
+          </div>
+          <div>
+            <div className="flex items-center justify-between text-xs text-slate-300">
+              <span>Opacity max</span>
+              <span>{config.decorative.opacityMax.toFixed(2)}</span>
+            </div>
             <input
               type="range"
               min={0.1}
@@ -489,29 +545,31 @@ export default function Controls({
               step={0.05}
               value={config.decorative.opacityMax}
               onChange={(event) =>
-                update({
-                  decorative: { ...config.decorative, opacityMax: Number(event.target.value) },
-                })
+                update({ decorative: { ...config.decorative, opacityMax: Number(event.target.value) } })
               }
-              className="mt-1 w-full"
+              className={sliderClassName}
             />
-          </label>
-        </div>
-      </div>
+          </div>
+        </CardContent>
+      </Card>
 
-      <div className={sectionClass}>
-        <h2 className="mb-3 text-lg font-semibold text-white">Post-processing</h2>
-        <div className="grid gap-3">
-          <label className="flex items-center gap-2 text-sm text-slate-300">
-            <input
-              type="checkbox"
+      <Card>
+        <CardHeader>
+          <CardTitle>Post-processing</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="flex items-center justify-between">
+            <Label>Vignette</Label>
+            <Switch
               checked={config.post.vignette}
               onChange={(event) => update({ post: { ...config.post, vignette: event.target.checked } })}
             />
-            Vignette
-          </label>
-          <label className="text-sm text-slate-300">
-            Vignette strength
+          </div>
+          <div>
+            <div className="flex items-center justify-between text-xs text-slate-300">
+              <span>Vignette strength</span>
+              <span>{config.post.vignetteStrength.toFixed(2)}</span>
+            </div>
             <input
               type="range"
               min={0}
@@ -521,27 +579,25 @@ export default function Controls({
               onChange={(event) =>
                 update({ post: { ...config.post, vignetteStrength: Number(event.target.value) } })
               }
-              className="mt-1 w-full"
+              className={sliderClassName}
             />
-          </label>
-          <label className="flex items-center gap-2 text-sm text-slate-300">
-            <input
-              type="checkbox"
+          </div>
+          <div className="flex items-center justify-between">
+            <Label>Subtle sharpen</Label>
+            <Switch
               checked={config.post.sharpen}
               onChange={(event) => update({ post: { ...config.post, sharpen: event.target.checked } })}
             />
-            Subtle sharpen
-          </label>
-          <label className="flex items-center gap-2 text-sm text-slate-300">
-            <input
-              type="checkbox"
+          </div>
+          <div className="flex items-center justify-between">
+            <Label>Film tint</Label>
+            <Switch
               checked={config.post.film}
               onChange={(event) => update({ post: { ...config.post, film: event.target.checked } })}
             />
-            Film tint
-          </label>
-        </div>
-      </div>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 }

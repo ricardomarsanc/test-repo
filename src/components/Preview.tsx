@@ -28,13 +28,11 @@ export default function Preview({ config, width, height }: PreviewProps) {
   }, [config, width, height]);
 
   return (
-    <div className="flex h-full w-full flex-col gap-4">
-      <div
-        className="relative w-full overflow-hidden rounded-2xl border border-slate-800 bg-slate-900 shadow-panel"
-        style={{ aspectRatio: `${width} / ${height}` }}
-      >
-        <canvas ref={canvasRef} className="h-full w-full" />
-      </div>
+    <div
+      className="relative w-full overflow-hidden rounded-2xl border border-slate-800 bg-slate-900"
+      style={{ aspectRatio: `${width} / ${height}` }}
+    >
+      <canvas ref={canvasRef} className="h-full w-full" />
     </div>
   );
 }
