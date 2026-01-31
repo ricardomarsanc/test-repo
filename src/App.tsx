@@ -269,9 +269,9 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100">
+    <div className="flex h-screen flex-col bg-slate-950 text-slate-100">
       <header className="border-b border-slate-900/80 bg-slate-950/60 px-6 py-4 backdrop-blur">
-        <div className="mx-auto flex w-full max-w-7xl items-center justify-between gap-4">
+        <div className="flex w-full items-center justify-between gap-4">
           <div>
             <p className="text-xs uppercase tracking-[0.2em] text-slate-500">Aurora UI</p>
             <h1 className="text-2xl font-semibold text-white">Gradient Background Builder</h1>
@@ -285,8 +285,8 @@ export default function App() {
         </div>
       </header>
 
-      <main className="mx-auto grid w-full max-w-7xl gap-6 px-6 py-8 lg:grid-cols-[240px_minmax(0,1fr)_360px]">
-        <aside className="flex flex-col gap-4">
+      <main className="grid flex-1 gap-6 overflow-hidden px-6 py-6 lg:grid-cols-[260px_minmax(0,1fr)_360px] min-h-0">
+        <aside className="flex h-full flex-col gap-4 overflow-y-auto pr-1">
           <Card>
             <CardHeader>
               <CardTitle>Scenes</CardTitle>
@@ -318,7 +318,7 @@ export default function App() {
           </Card>
         </aside>
 
-        <section className="flex flex-col gap-4">
+        <section className="flex h-full min-h-0 flex-col gap-4">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between">
               <CardTitle>Preview</CardTitle>
@@ -336,7 +336,7 @@ export default function App() {
           </Card>
         </section>
 
-        <aside className="max-h-[calc(100vh-140px)] overflow-y-auto pr-1">
+        <aside className="h-full min-h-0 overflow-y-auto pr-1">
           <Controls
             config={config}
             onChange={setConfig}
@@ -355,9 +355,7 @@ export default function App() {
         </aside>
       </main>
 
-      <footer className="mx-auto max-w-7xl px-6 pb-10 text-xs text-slate-500">
-        <p>Run: npm install · npm run dev</p>
-      </footer>
+      <footer className="px-6 pb-6 text-xs text-slate-500" />
     </div>
   );
 }
