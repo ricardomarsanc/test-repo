@@ -40,24 +40,6 @@ const baseConfig: RenderConfig = {
     scale: 1,
     rotation: 12,
   },
-  decorative: {
-    enabled: true,
-    blobs: true,
-    bokeh: true,
-    clouds: false,
-    streaks: true,
-    density: 0.5,
-    blur: 0.7,
-    colorStrategy: "palette",
-    opacityMin: 0.2,
-    opacityMax: 0.6,
-  },
-  post: {
-    vignette: true,
-    vignetteStrength: 0.35,
-    sharpen: false,
-    film: true,
-  },
 };
 
 const presets = [
@@ -68,7 +50,6 @@ const presets = [
       seed: "prism",
       gradient: { type: "conic", angle: 200, palette: palettes.prism, softness: 0.55 },
       pattern: { enabled: true, type: "halftone", opacity: 0.2, scale: 1.2, rotation: 45 },
-      decorative: { ...baseConfig.decorative, blobs: true, bokeh: true, streaks: true },
     },
   },
   {
@@ -87,7 +68,6 @@ const presets = [
       seed: "sunset",
       gradient: { type: "linear", angle: 140, palette: palettes.sunset, softness: 0.55 },
       pattern: { enabled: true, type: "diagonal", opacity: 0.18, scale: 1.1, rotation: 35 },
-      post: { vignette: true, vignetteStrength: 0.4, sharpen: false, film: true },
     },
   },
   {
@@ -97,7 +77,6 @@ const presets = [
       seed: "ocean",
       gradient: { type: "radial", angle: 90, palette: palettes.ocean, softness: 0.6 },
       pattern: { enabled: true, type: "dots", opacity: 0.15, scale: 1.1, rotation: 0 },
-      decorative: { ...baseConfig.decorative, clouds: true, streaks: false },
     },
   },
   {
@@ -107,7 +86,6 @@ const presets = [
       seed: "candy",
       gradient: { type: "mesh", angle: 120, palette: palettes.candy, softness: 0.75 },
       pattern: { enabled: true, type: "grid", opacity: 0.12, scale: 0.8, rotation: 0 },
-      decorative: { ...baseConfig.decorative, bokeh: true, blobs: true },
     },
   },
   {
@@ -118,8 +96,6 @@ const presets = [
       gradient: { type: "shader", angle: 210, palette: palettes.vertex, softness: 0.68 },
       pattern: { enabled: true, type: "vertex", opacity: 0.18, scale: 1, rotation: 10 },
       noise: { enabled: true, strength: 0.08, scale: 1.2, monochrome: false, texture: "grain" },
-      decorative: { ...baseConfig.decorative, blobs: true, bokeh: false, streaks: false },
-      post: { vignette: true, vignetteStrength: 0.35, sharpen: true, film: false },
     },
   },
   {
@@ -130,7 +106,6 @@ const presets = [
       gradient: { type: "linear", angle: 210, palette: palettes.noirNeon, softness: 0.5 },
       noise: { enabled: true, strength: 0.08, scale: 1.2, monochrome: false, texture: "classic" },
       pattern: { enabled: true, type: "topo", opacity: 0.2, scale: 1, rotation: 18 },
-      post: { vignette: true, vignetteStrength: 0.55, sharpen: true, film: false },
     },
   },
   {
@@ -141,8 +116,6 @@ const presets = [
       gradient: { type: "shader", angle: 140, palette: palettes.painterly, softness: 0.8 },
       noise: { enabled: true, strength: 0.12, scale: 0.8, monochrome: false, texture: "grain" },
       pattern: { enabled: false, type: "waves", opacity: 0.12, scale: 1, rotation: 0 },
-      decorative: { ...baseConfig.decorative, blobs: true, bokeh: false, clouds: true, streaks: false },
-      post: { vignette: false, vignetteStrength: 0.2, sharpen: false, film: true },
     },
   },
 ];
@@ -183,24 +156,6 @@ function createRandomConfig(seed: string): RenderConfig {
       opacity: randomBetween(rng, 0.08, 0.22),
       scale: randomBetween(rng, 0.7, 1.5),
       rotation: randomBetween(rng, 0, 90),
-    },
-    decorative: {
-      enabled: rng() > 0.15,
-      blobs: rng() > 0.2,
-      bokeh: rng() > 0.2,
-      clouds: rng() > 0.6,
-      streaks: rng() > 0.3,
-      density: randomBetween(rng, 0.3, 0.8),
-      blur: randomBetween(rng, 0.3, 0.9),
-      colorStrategy: rng() > 0.5 ? "palette" : "neutral",
-      opacityMin: randomBetween(rng, 0.12, 0.3),
-      opacityMax: randomBetween(rng, 0.4, 0.7),
-    },
-    post: {
-      vignette: rng() > 0.4,
-      vignetteStrength: randomBetween(rng, 0.2, 0.55),
-      sharpen: rng() > 0.7,
-      film: rng() > 0.5,
     },
   };
 }

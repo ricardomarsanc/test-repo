@@ -34,34 +34,12 @@ export interface PatternConfig {
   rotation: number;
 }
 
-export interface DecorativeConfig {
-  enabled: boolean;
-  blobs: boolean;
-  bokeh: boolean;
-  clouds: boolean;
-  streaks: boolean;
-  density: number;
-  blur: number;
-  colorStrategy: "palette" | "neutral";
-  opacityMin: number;
-  opacityMax: number;
-}
-
-export interface PostConfig {
-  vignette: boolean;
-  vignetteStrength: number;
-  sharpen: boolean;
-  film: boolean;
-}
-
 export interface RenderConfig {
   seed: string;
   lockSeed: boolean;
   gradient: GradientConfig;
   noise: NoiseConfig;
   pattern: PatternConfig;
-  decorative: DecorativeConfig;
-  post: PostConfig;
 }
 
 export interface RenderOptions {
@@ -86,24 +64,11 @@ export function renderBackground(
   const rng = seededRandom(config.seed);
 
   drawGradient(ctx, config.gradient, rng, options.width, options.height);
-  if (config.decorative.enabled) {
-    drawDecorative(ctx, config, rng, options.width, options.height);
-  }
   if (config.pattern.enabled) {
     drawPattern(ctx, config, rng, options.width, options.height);
   }
   if (config.noise.enabled) {
     drawNoise(ctx, config.noise, rng, options.width, options.height);
-  }
-  if (config.post.vignette) {
-    drawVignette(ctx, config.post.vignetteStrength, options.width, options.height);
-  }
-  if (config.post.film) {
-    ctx.fillStyle = "rgba(255, 228, 196, 0.08)";
-    ctx.fillRect(0, 0, options.width, options.height);
-  }
-  if (config.post.sharpen) {
-    applySharpen(ctx, options.width, options.height);
   }
 }
 
@@ -322,98 +287,6 @@ function clamp01(value: number) {
   return Math.max(0, Math.min(1, value));
 }
 
-function drawDecorative(
-  ctx: CanvasRenderingContext2D,
-  config: RenderConfig,
-  rng: PRNG,
-  width: number,
-  height: number
-) {
-  const { decorative, gradient } = config;
-  const count = Math.floor(6 + decorative.density * 20);
-  const colors = decorative.colorStrategy === "palette" ? gradient.palette : ["rgba(255,255,255,0.7)"];
-
-  if (decorative.blobs) {
-    for (let i = 0; i < count; i += 1) {
-      const radius = randomBetween(rng, 0.2, 0.5) * Math.min(width, height);
-      const x = randomBetween(rng, -0.1, 1.1) * width;
-      const y = randomBetween(rng, -0.1, 1.1) * height;
-      ctx.save();
-      ctx.globalAlpha = randomBetween(rng, decorative.opacityMin, decorative.opacityMax);
-      ctx.fillStyle = pickOne(rng, colors);
-      ctx.shadowColor = ctx.fillStyle as string;
-      ctx.shadowBlur = decorative.blur * 50;
-      ctx.beginPath();
-      ctx.arc(x, y, radius, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.restore();
-    }
-  }
-
-  if (decorative.bokeh) {
-    for (let i = 0; i < count; i += 1) {
-      const radius = randomBetween(rng, 20, 120);
-      const x = randomBetween(rng, -0.1, 1.1) * width;
-      const y = randomBetween(rng, -0.1, 1.1) * height;
-      const color = pickOne(rng, colors);
-      const grad = ctx.createRadialGradient(x, y, 0, x, y, radius);
-      grad.addColorStop(0, `${color}cc`);
-      grad.addColorStop(1, "transparent");
-      ctx.globalAlpha = randomBetween(rng, decorative.opacityMin, decorative.opacityMax);
-      ctx.fillStyle = grad;
-      ctx.beginPath();
-      ctx.arc(x, y, radius, 0, Math.PI * 2);
-      ctx.fill();
-    }
-  }
-
-  if (decorative.clouds) {
-    for (let i = 0; i < count; i += 1) {
-      const baseX = randomBetween(rng, -0.2, 1.2) * width;
-      const baseY = randomBetween(rng, 0.0, 1.1) * height;
-      const cluster = 4 + Math.floor(rng() * 5);
-      for (let j = 0; j < cluster; j += 1) {
-        const radius = randomBetween(rng, 40, 160);
-        const x = baseX + randomBetween(rng, -100, 100);
-        const y = baseY + randomBetween(rng, -60, 60);
-        ctx.save();
-        ctx.globalAlpha = randomBetween(rng, decorative.opacityMin, decorative.opacityMax) * 0.8;
-        ctx.fillStyle = pickOne(rng, colors);
-        ctx.shadowColor = ctx.fillStyle as string;
-        ctx.shadowBlur = decorative.blur * 40;
-        ctx.beginPath();
-        ctx.arc(x, y, radius, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.restore();
-      }
-    }
-  }
-
-  if (decorative.streaks) {
-    const streaks = Math.floor(3 + decorative.density * 8);
-    for (let i = 0; i < streaks; i += 1) {
-      const length = randomBetween(rng, 0.6, 1.4) * width;
-      const thickness = randomBetween(rng, 20, 60);
-      const x = randomBetween(rng, -0.2, 1.2) * width;
-      const y = randomBetween(rng, -0.2, 1.2) * height;
-      const angle = randomBetween(rng, -30, 30) * (Math.PI / 180);
-      ctx.save();
-      ctx.translate(x, y);
-      ctx.rotate(angle);
-      ctx.globalAlpha = randomBetween(rng, decorative.opacityMin, decorative.opacityMax);
-      const color = pickOne(rng, colors);
-      const grad = ctx.createLinearGradient(0, 0, length, 0);
-      grad.addColorStop(0, "transparent");
-      grad.addColorStop(0.5, `${color}cc`);
-      grad.addColorStop(1, "transparent");
-      ctx.fillStyle = grad;
-      ctx.shadowColor = color;
-      ctx.shadowBlur = decorative.blur * 30;
-      ctx.fillRect(-length / 2, -thickness / 2, length, thickness);
-      ctx.restore();
-    }
-  }
-}
 
 function drawPattern(
   ctx: CanvasRenderingContext2D,
@@ -649,34 +522,5 @@ function drawGrain(
   ctx.imageSmoothingEnabled = true;
   ctx.drawImage(grainCanvas, 0, 0, width, height);
   ctx.globalCompositeOperation = "source-over";
-  ctx.restore();
-}
-
-function drawVignette(ctx: CanvasRenderingContext2D, strength: number, width: number, height: number) {
-  const grad = ctx.createRadialGradient(
-    width / 2,
-    height / 2,
-    Math.min(width, height) * 0.2,
-    width / 2,
-    height / 2,
-    Math.max(width, height) * 0.8
-  );
-  grad.addColorStop(0, "rgba(0,0,0,0)");
-  grad.addColorStop(1, `rgba(0,0,0,${strength})`);
-  ctx.fillStyle = grad;
-  ctx.fillRect(0, 0, width, height);
-}
-
-function applySharpen(ctx: CanvasRenderingContext2D, width: number, height: number) {
-  const temp = document.createElement("canvas");
-  temp.width = width;
-  temp.height = height;
-  const tctx = temp.getContext("2d");
-  if (!tctx) return;
-  tctx.drawImage(ctx.canvas, 0, 0, width, height);
-  ctx.save();
-  ctx.filter = "contrast(1.05) saturate(1.04)";
-  ctx.drawImage(temp, 0, 0, width, height);
-  ctx.filter = "none";
   ctx.restore();
 }
