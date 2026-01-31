@@ -190,6 +190,7 @@ export default function Controls({
               <option value="radial">Radial</option>
               <option value="conic">Conic</option>
               <option value="mesh">Mesh-like</option>
+              <option value="shader">Shader wash</option>
             </select>
           </div>
           <div>
@@ -342,6 +343,24 @@ export default function Controls({
               }
             />
           </div>
+          <div className="grid gap-3">
+            <Label>Texture</Label>
+            <select
+              className="h-10 w-full rounded-xl border border-slate-800 bg-slate-950/70 px-3 text-sm text-slate-100 focus:border-sky-500 focus:outline-none focus:ring-1 focus:ring-sky-500"
+              value={config.noise.texture}
+              onChange={(event) =>
+                update({
+                  noise: {
+                    ...config.noise,
+                    texture: event.target.value as RenderConfig["noise"]["texture"],
+                  },
+                })
+              }
+            >
+              <option value="classic">Classic noise</option>
+              <option value="grain">Film grain</option>
+            </select>
+          </div>
         </CardContent>
       </Card>
 
@@ -377,6 +396,7 @@ export default function Controls({
               <option value="waves">Waves</option>
               <option value="topo">Topographic</option>
               <option value="halftone">Halftone</option>
+              <option value="vertex">Vertex mesh</option>
             </select>
           </div>
           <div>

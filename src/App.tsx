@@ -31,6 +31,7 @@ const baseConfig: RenderConfig = {
     strength: 0.06,
     scale: 1,
     monochrome: true,
+    texture: "grain",
   },
   pattern: {
     enabled: true,
@@ -110,14 +111,38 @@ const presets = [
     },
   },
   {
+    name: "Vertex Flow",
+    config: {
+      ...baseConfig,
+      seed: "vertex-flow",
+      gradient: { type: "shader", angle: 210, palette: palettes.vertex, softness: 0.68 },
+      pattern: { enabled: true, type: "vertex", opacity: 0.18, scale: 1, rotation: 10 },
+      noise: { enabled: true, strength: 0.08, scale: 1.2, monochrome: false, texture: "grain" },
+      decorative: { ...baseConfig.decorative, blobs: true, bokeh: false, streaks: false },
+      post: { vignette: true, vignetteStrength: 0.35, sharpen: true, film: false },
+    },
+  },
+  {
     name: "Noir Neon",
     config: {
       ...baseConfig,
       seed: "noir",
       gradient: { type: "linear", angle: 210, palette: palettes.noirNeon, softness: 0.5 },
-      noise: { enabled: true, strength: 0.08, scale: 1.2, monochrome: false },
+      noise: { enabled: true, strength: 0.08, scale: 1.2, monochrome: false, texture: "classic" },
       pattern: { enabled: true, type: "topo", opacity: 0.2, scale: 1, rotation: 18 },
       post: { vignette: true, vignetteStrength: 0.55, sharpen: true, film: false },
+    },
+  },
+  {
+    name: "Painterly Mist",
+    config: {
+      ...baseConfig,
+      seed: "painterly",
+      gradient: { type: "shader", angle: 140, palette: palettes.painterly, softness: 0.8 },
+      noise: { enabled: true, strength: 0.12, scale: 0.8, monochrome: false, texture: "grain" },
+      pattern: { enabled: false, type: "waves", opacity: 0.12, scale: 1, rotation: 0 },
+      decorative: { ...baseConfig.decorative, blobs: true, bokeh: false, clouds: true, streaks: false },
+      post: { vignette: false, vignetteStrength: 0.2, sharpen: false, film: true },
     },
   },
 ];
@@ -126,8 +151,16 @@ const randomSeed = () => `seed-${Math.random().toString(36).slice(2, 8)}`;
 
 function createRandomConfig(seed: string): RenderConfig {
   const rng = seededRandom(seed);
-  const gradientType = pickOne(rng, ["linear", "radial", "conic", "mesh"] as const);
-  const patternType = pickOne(rng, ["dots", "grid", "diagonal", "waves", "topo", "halftone"] as const);
+  const gradientType = pickOne(rng, ["linear", "radial", "conic", "mesh", "shader"] as const);
+  const patternType = pickOne(rng, [
+    "dots",
+    "grid",
+    "diagonal",
+    "waves",
+    "topo",
+    "halftone",
+    "vertex",
+  ] as const);
   return {
     seed,
     lockSeed: false,
@@ -142,6 +175,7 @@ function createRandomConfig(seed: string): RenderConfig {
       strength: randomBetween(rng, 0.03, 0.12),
       scale: randomBetween(rng, 0.7, 1.4),
       monochrome: rng() > 0.4,
+      texture: rng() > 0.5 ? "grain" : "classic",
     },
     pattern: {
       enabled: rng() > 0.3,
@@ -278,6 +312,7 @@ export default function App() {
             <CardContent className="space-y-2 text-xs text-slate-400">
               <p>Lock the seed to reproduce a background exactly.</p>
               <p>Use mesh gradients for cinematic lighting.</p>
+              <p>Try shader wash + film grain for painterly blends.</p>
               <p>Export at 4K for full-resolution wallpapers.</p>
             </CardContent>
           </Card>

@@ -7,6 +7,8 @@ export const palettes = {
   ocean: ["#0f172a", "#0ea5e9", "#22d3ee", "#38bdf8"],
   candy: ["#f472b6", "#fb7185", "#facc15", "#34d399"],
   noirNeon: ["#0b1020", "#22c55e", "#f97316", "#38bdf8"],
+  vertex: ["#0ea5e9", "#6366f1", "#a78bfa", "#f472b6"],
+  painterly: ["#f7b59a", "#e590a5", "#c1a1f1", "#8ab4f8", "#9be7c4"],
 };
 
 const basePool = [
